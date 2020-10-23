@@ -1,4 +1,4 @@
-# DM_Perfornance
+# DM_Performance
 A function that takes signal and background anomaly scores and returns the area under the ROC curve, and the Z score at three different background efficiencies.
 
 Takes signal and background weights as an optional variable.
