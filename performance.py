@@ -1,8 +1,6 @@
 import numpy as np
 import warnings
 from sklearn.metrics import auc
-from scipy.interpolate import UnivariateSpline
-import matplotlib.pyplot as plt
 
 def performance(bkg_events, sig_events, bkg_weights = 'ones', sig_weights = 'ones'):
     # bkg_events is a 1D array of anomaly scores for the background dataset
