@@ -1,5 +1,4 @@
 import numpy as np
-import warnings
 from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
 
