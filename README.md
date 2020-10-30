@@ -1,8 +1,8 @@
 # DM_Performance
 A function that takes signal and background anomaly scores and returns the area under the ROC curve, and the Z score at three different background efficiencies.
 
-Takes signal and background weights as an optional variable.
+Takes signal and background weights as optional variables.
 
-Takes approximately 10-30 minutes to run depending on the size of the signal/background and on the shape of the distributions.
+Uses the sklearn metrics package for the auc and roc_curve functions.
 
 If you have any questions please send me an email at adam.leinweber@adelaide.edu.au
