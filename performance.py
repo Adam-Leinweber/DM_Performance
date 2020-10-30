@@ -8,7 +8,7 @@ def performance(bkg_events, sig_events, bkg_weights = 'ones', sig_weights = 'one
     # sig_events is a 1D array of anomaly scores for the signal dataset
     # bkg_weights is an optional 1D array of weights for the background dataset defaults to ones
     # sig_weights is an optional 1D array of weights for the signal dataset defaults to ones
-    # Returns: Area under the ROC curve, and S/sqrt(S+B) for three background efficiencies: 10^-2, 10^-3, 10^-4
+    # Returns: Area under the ROC curve, and signal efficiencies for three background efficiencies: 10^-2, 10^-3, 10^-4
 
     #if sig/bkg weights unused, initialise to ones. This returns a warning if weights are defined, hence the warning filter.
     warnings.simplefilter(action='ignore',category=FutureWarning)
