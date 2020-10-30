@@ -50,29 +50,14 @@ def performance(bkg_events, sig_events, bkg_weights = 'ones', sig_weights = 'one
     for i in range(len(FPR)):
         bkg_eff = FPR[i]
         if bkg_eff >= efficiency1 and done1 == False:
-            S = sum(sig_weights[sig_events > thresholds[i]])
-            B = sum(bkg_weights[bkg_events > thresholds[i]])
-            epsilon1 = S/np.sqrt(S+B) 
+            epsilon1 = TPR[i]
             done1 = True
-            print(bkg_eff)
-            print(S)
-            print(B)
         if bkg_eff >= efficiency2 and done2 == False:
-            S = sum(sig_weights[sig_events > thresholds[i]])
-            B = sum(bkg_weights[bkg_events > thresholds[i]])
-            epsilon2 = S/np.sqrt(S+B) 
+            epsilon2 = TPR[i]
             done2 = True
-            print(bkg_eff)
-            print(S)
-            print(B)
         if bkg_eff >= efficiency3 and done3 == False:
-            S = sum(sig_weights[sig_events > thresholds[i]])
-            B = sum(bkg_weights[bkg_events > thresholds[i]])
-            epsilon3 = S/np.sqrt(S+B) 
+            epsilon3 = TPR[i]
             done3 = True
-            print(bkg_eff)
-            print(S)
-            print(B)
 
         if done1 and done2 and done3:
             break
