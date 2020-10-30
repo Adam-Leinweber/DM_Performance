@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 from sklearn.metrics import auc
+from sklearn.metrics import roc_curve
 
 def performance(bkg_events, sig_events, bkg_weights = 'ones', sig_weights = 'ones'):
     # bkg_events is a 1D array of anomaly scores for the background dataset
@@ -17,48 +18,20 @@ def performance(bkg_events, sig_events, bkg_weights = 'ones', sig_weights = 'one
         sig_weights = np.ones(len(sig_events))
     warnings.simplefilter(action='default',category=FutureWarning)
 
-    ### AUC CALCULATION ###
-    #loop over N slices between bkg_max and bkg_min and calculate bkg/sig efficiency to the right of each cut.
-    N = 1000 #number of points to build the ROC curve for. Increase this if more accuracy is necessary. 1000 seems to be appropriate for AUC.
-    MIN = min(bkg_events)
-    MAX = max(bkg_events)
-    bins = np.linspace(MIN,MAX, N+1)
+    #Create background and signal labels
+    bkg_labels = np.zeros(len(bkg_events))
+    sig_labels = np.ones(len(sig_events))
+    
+    #stitch all results together
+    events = np.append(bkg_events, sig_events)
+    weights = np.append(bkg_weights, sig_weights)
+    labels = np.append(bkg_labels, sig_labels)
 
-    #make histograms to perform cuts
-    bkg_hist, bins = np.histogram(np.clip(bkg_events, MIN, MAX), bins = bins, weights = bkg_weights)
-    sig_hist, bins = np.histogram(np.clip(sig_events, MIN, MAX), bins = bins, weights = sig_weights)
+    #Build ROC curve using sklearns roc_curve function
+    FPR, TPR, thresholds = roc_curve(labels, events, sample_weight = weights)
 
-    #number of sig/bkg events
-    nsig = float(sum(sig_hist))
-    nbkg = float(sum(bkg_hist))
-
-    #sig/bkg efficiency
-    sig_eff = np.full(N, float(-1))
-    bkg_eff = np.full(N, float(-1))
-
-    #construct ROC curve and get AUC
-    for i in range(N):        
-        #number of sig/bkg events greater than a cut at x
-        sig_gtx = float(sum(sig_hist[i:]))
-        bkg_gtx = float(sum(bkg_hist[i:]))                                        
-        
-        #calculate efficiencies
-        sig_eff[i] = float(sig_gtx)/float(nsig)
-        bkg_eff[i] = float(bkg_gtx)/float(nbkg)
-
-    #calculate area under the curve
-    AUC = auc(bkg_eff, sig_eff)
-
-    ### EPSILON CALCULATION ###
-    #Calculate very low background efficiencies. Need high value of N
-    N = 100000 #number of points to build the ROC curve for. Increase this if more accuracy is necessary. 100000 seems to be appropriate for epsilon calculations
-    MIN = min(bkg_events)
-    MAX = max(bkg_events)
-    bins = np.linspace(MIN,MAX, N+1)
-
-    #make histograms to perform cuts
-    bkg_hist, bins = np.histogram(np.clip(bkg_events, MIN, MAX), bins = bins, weights = bkg_weights)
-    sig_hist, bins = np.histogram(np.clip(sig_events, MIN, MAX), bins = bins, weights = sig_weights)
+    #Calculate area under the ROC curve
+    AUC = auc(FPR, TPR)
 
     #background efficiencies
     efficiency1 = 10.0**-2
@@ -73,25 +46,33 @@ def performance(bkg_events, sig_events, bkg_weights = 'ones', sig_weights = 'one
     done2 = False
     done3 = False
 
-    for i in range(N)[::-1]:
-        #number of sig/bkg events greater than a cut at x
-        sig_gtx = float(sum(sig_hist[i:]))
-        bkg_gtx = float(sum(bkg_hist[i:]))                                        
-        
-        #calculate background efficiency
-        bkg_eff = float(bkg_gtx)/float(nbkg)
-
-        #calculate signal efficiencies as close to the desired background efficiency as possible. 
-        #If this is not close enough to the desired efficiency, increase N
+    #iterate through bkg efficiencies and get as close as possible to the desired efficiencies.
+    for i in range(len(FPR)):
+        bkg_eff = FPR[i]
         if bkg_eff >= efficiency1 and done1 == False:
-            epsilon1 = sig_gtx/np.sqrt(sig_gtx+bkg_gtx)
+            S = sum(sig_weights[sig_events > thresholds[i]])
+            B = sum(bkg_weights[bkg_events > thresholds[i]])
+            epsilon1 = S/np.sqrt(S+B) 
             done1 = True
+            print(bkg_eff)
+            print(S)
+            print(B)
         if bkg_eff >= efficiency2 and done2 == False:
-            epsilon2 = sig_gtx/np.sqrt(sig_gtx+bkg_gtx)
+            S = sum(sig_weights[sig_events > thresholds[i]])
+            B = sum(bkg_weights[bkg_events > thresholds[i]])
+            epsilon2 = S/np.sqrt(S+B) 
             done2 = True
+            print(bkg_eff)
+            print(S)
+            print(B)
         if bkg_eff >= efficiency3 and done3 == False:
-            epsilon3 = sig_gtx/np.sqrt(sig_gtx+bkg_gtx)
+            S = sum(sig_weights[sig_events > thresholds[i]])
+            B = sum(bkg_weights[bkg_events > thresholds[i]])
+            epsilon3 = S/np.sqrt(S+B) 
             done3 = True
+            print(bkg_eff)
+            print(S)
+            print(B)
 
         if done1 and done2 and done3:
             break
