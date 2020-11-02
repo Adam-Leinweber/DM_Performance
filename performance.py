@@ -16,7 +16,7 @@ def performance(bkg_events, sig_events):
     labels = np.append(bkg_labels, sig_labels)
 
     #Build ROC curve using sklearns roc_curve function
-    FPR, TPR, thresholds = roc_curve(labels, events))
+    FPR, TPR, thresholds = roc_curve(labels, events)
 
     #Calculate area under the ROC curve
     AUC = auc(FPR, TPR)
