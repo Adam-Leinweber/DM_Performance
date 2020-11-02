@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
 
-def performance(bkg_events, sig_events)
+def performance(bkg_events, sig_events):
     # bkg_events is a 1D array of anomaly scores for the background dataset
     # sig_events is a 1D array of anomaly scores for the signal dataset
     # Returns: Area under the ROC curve, and signal efficiencies for three background efficiencies: 10^-2, 10^-3, 10^-4
